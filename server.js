@@ -51,6 +51,7 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
   if (hash == req.headers["x-paystack-signature"]) {
     // Retrieve the request's body
     const event = req.body;
+    console.log('6666666666666')
     console.log(event)
     if(event.data.status == 'success'){
         console.log('SUCCESSS')
