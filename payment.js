@@ -28,7 +28,7 @@ const processTransaction = async (planCode, email, callback) => {
     })[0]
     const params = JSON.stringify({
       email: email,
-      amount: 79000,
+      amount: 100,
       plan: thisPlan.id,
     });
 
