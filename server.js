@@ -64,7 +64,7 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
     }
     // Do something with event
   }
-  res.send(200);
+//   res.send(200);
 });
 
 app.get('/payment/verify', (req, res)=>{
