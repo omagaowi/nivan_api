@@ -4,6 +4,7 @@
   "description": "the official server for nivanfx ",
   "main": "server.js",
   "start": "node server",
+  "build": "node server",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
