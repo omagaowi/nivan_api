@@ -18,6 +18,7 @@ app.get('/redirect/payment/:plan', (req, res)=>{
 app.post('/submit/payment/:plan', (req, res)=>{
     const planCode = req.params.plan
     const body = req.body
+    console.log('trurr')
     processTransaction(planCode, body.email, ({result, err})=>{
         if(!err){
             if(result.status){
