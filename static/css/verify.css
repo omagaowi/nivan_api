@@ -1,0 +1,205 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.container{
+    width: 100vw;
+    height: 100vh;
+    background: #d9d9d9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader{
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader p{
+    color: #505050;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.loading{
+    max-width: 300px;
+    width: 90vw;
+    height: 10px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.loading .bar{
+    width: 40%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: gray;
+    animation: load linear infinite;
+    animation-duration: 3s;
+}
+
+.container.verify .loader{
+    display: flex;
+}
+
+.main-box{
+    max-width: 400px;
+    min-height: 250px;
+    height: auto;
+    width: 95%;
+    background: #fff;
+}
+
+.main-box .invalid{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-box .success{
+    width: 100%;
+    height: auto;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-box .success svg,
+.invalid svg{
+    width: 70px;
+    height: 70px;
+    margin-top: 30px;
+}
+
+.invalid svg{
+    margin: 0px;
+    margin-bottom: 10px;
+    width: 90px;
+    height: 90px;
+}
+
+.invalid button{
+    width: 100px;
+    height: 30px;
+    margin-top: 15px;
+    border: none;
+    outline: none;
+}
+
+.invalid button:hover{
+    cursor: pointer;
+    background: #6b09bb;
+    color: #fff;
+}
+
+
+.main-box .success h1{
+    color: #505050;
+    margin-top: 10px;
+}
+
+
+.main-box .success p{
+    color: #797979;
+    font-size: 15px;
+}
+
+
+.main-box .note{
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.note ul{
+    width: 95%;
+    height: auto;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+.note li{
+    font-size: 13px;
+    width: 100%;
+    list-style: none;
+    /* justify-content: center; */
+    /* text-align: center; */
+    color: #505050;
+    margin: 5px 0px;
+    padding-left: 10px;
+}
+
+.link-banner{
+    max-width: 300px;
+    width: 95%;
+    height: 30px;
+    margin-bottom: 10px;
+    background: #d9d9d9;
+    display: flex;
+}
+
+.link-banner .copy{
+    width: 50px;
+    height: 30px;
+    /* background: red; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.link-banner .copy svg{
+    width: 20px;
+    margin: 0px;
+    height: 20px;
+    cursor: pointer;
+
+}
+
+.link-banner a{
+    width: calc(100% - 50px);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    overflow: hidden;
+    opacity: .7;
+}
+
+.main-box .invalid h1{
+    font-size: 25px;
+    text-align: center;
+}
+
+
+@keyframes load {
+    0%{
+        left: 0%;
+        transform: scaleX(1);
+    }
+    40%{
+        transform: scaleX(1.25);
+    }
+    50%{
+        transform: scaleX(1);
+    }
+    100%{
+        transform: scaleX(1);
+        left: 110%;
+    }
+}

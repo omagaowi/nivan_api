@@ -1,6 +1,7 @@
 const express = require('express');
 const { processTransaction } = require('./payment')
 const crypto = require("crypto");
+const cookieParser = require('cookie-parser')
 
 
 const app = express()
@@ -8,6 +9,7 @@ const app = express()
 app.use(express.static('static'))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
+app.use(cookieParser())
 
 app.get('/redirect/payment/:plan', (req, res)=>{
     res.sendFile(__dirname + '/static/auth.html')
@@ -50,15 +52,20 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
     // Retrieve the request's body
     const event = req.body;
     console.log(event)
-    console.log('api')
+    if(event.data.status == 'success'){
+        const plan = event.data.plan.plan_code
+        const ref = event.data.reference
+        res.cookie('planId', plan)
+        res.cookie('ref', ref)
+        res.redirect('/payment/verify')
+    }
     // Do something with event
   }
   res.send(200);
 });
 
-app.get('/hh', (req, res)=>{
-    console.log('hhh')
-    res.send('hh')
+app.get('/payment/verify', (req, res)=>{
+    res.sendFile(__dirname + '/static/verify.html')
 })
 
 app.listen(3000, (err)=>{
