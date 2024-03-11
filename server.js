@@ -53,6 +53,7 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
     const event = req.body;
     console.log(event)
     if(event.data.status == 'success'){
+        console.log('SUCCESSS')
         const plan = event.data.plan.plan_code
         const ref = event.data.reference
         res.cookie('planId', plan)
