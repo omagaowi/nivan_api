@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete your Payment</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+   <div class="container">
+    <img src="/images/bg.jpg" alt="" loading="lazy" class="bg">
+    <div class="main">
+        <div class="form-box">
+            <div class="error-msg">
+                <p>An Error Occured!!</p>
+            </div>
+            <img src="/images/mini_logo.png" alt="" class="logo">
+            <h2>Intermediate Mentorship</h2>
+            <p class="plan-text">sign up for $30/mo</p>
+            <form action="">
+                <label for="">
+                    <input type="text" placeholder="Full Name" name="full_name">
+                </label>
+                <label for="">
+                    <input type="text" placeholder="Email" name="email">
+                </label>
+                <label for="" class="phone">
+                    <div class="tel-drop">
+                        <p class="country-code">
+                            NG
+                        </p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+                          </svg>
+                    </div>
+                    <input type="text" placeholder="Phone Number" name="number">
+                </label>
+                <label for="">
+                    <input type="text" placeholder="Telegram Username" name="telegram">
+                </label>
+                <button type="submit" class="submit-btn">
+                    Sign up
+                    <div class="loading">
+                        <img src="/images/loader.gif" alt="">
+                    </div>
+                </button>
+            </form>
+            <div class="tel-bg">
+                <div class="tel-window">
+                    <div class="heading">
+                        <div class="back-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                              </svg>
+                        </div>
+                        <h3>Choose a Country</h3>
+                        <div class="search-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                              </svg>
+                        </div>
+                        <input type="text" class="search-country" placeholder="Search">
+                    </div>
+                    <div class="all-countries">
+                        <div class="countries-overflow">
+                            <div class="country-item">
+                                <div class="country-name">
+                                    Nigeria
+                                </div>
+                                <div class="phone-code">
+                                    +234
+                                </div>
+                            </div>
+                            <div class="country-item">
+                                <div class="country-name">
+                                    Nigeria
+                                </div>
+                                <div class="phone-code">
+                                    +234
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   </div>
+
+   <script src="/js/auth.js"></script>
+</body>
+</html>
