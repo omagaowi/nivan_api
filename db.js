@@ -30,6 +30,7 @@ const createUser = (values, callback) => {
                 status: false,
                 data: "Error Creating User",
               };
+              console.log(err)
         }
         callback(res)
     })
