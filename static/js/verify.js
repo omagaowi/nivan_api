@@ -47,26 +47,35 @@ const plans = [
   },
 ];
 
+const runValidation = () => {
+      const ref = window.location.href.split("&")[1].split("=")[1];
+        container.classList.remove("error");
+      container.classList.add("verify");
+       container.classList.remove("valid");
+      // const ref = "7ttoydmt1q";
+      console.log(ref);
+      fetch(`/verify/${ref}`)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          if (data.status) {
+            const thisPlan = plans.filter(function (el) {
+              return el.planCode == data.data.plan;
+            })[0];
+            displaySuccess(thisPlan);
+          } else {
+            displayError("Transaction does not exist.");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          displayError("Check your connection and try again.");
+        });
+    }
+
 document.addEventListener('DOMContentLoaded', ()=>{
-    // const ref = window.location.href.split("&")[1].split("=")[1];
-    container.classList.add('verify')
-    const ref = "7ttoydmt1q";
-    console.log(ref)
-    fetch(`/verify/${ref}`).then(response => {
-        return response.json()
-    }).then(data => {
-        if(data.status){
-            const thisPlan = plans.filter(function(el){ 
-                return el.planCode == data.data.plan
-             })[0]
-            displaySuccess(thisPlan)
-        }else{
-            displayError('Transaction does not exist.')
-        }
-    }).catch((err)=>{
-        console.log(err)
-         displayError("Check your connection and try again.");
-    })
+    runValidation()
 })
 
 const displayError = (msg) => {
@@ -87,3 +96,7 @@ const displaySuccess = (plan) => {
     container.querySelector('.link-banner a').innerHTML = plan.telegram
     container.querySelector(".link-banner a").href = plan.telegram;
 }
+
+document.querySelector(".retry-btn").addEventListener('click', ()=>{
+  runValidation()
+});
