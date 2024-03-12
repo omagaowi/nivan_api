@@ -1,6 +1,7 @@
 const express = require('express');
 const { processTransaction, verifyTransaction } = require('./payment')
 const crypto = require("crypto");
+var cors = require("cors");
 const cookieParser = require('cookie-parser')
 
 const { createUser, newSubcription, findUserWithId, getSubscriptionWithRef } = require('./db');
@@ -68,6 +69,7 @@ app.use(express.static('static'))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors())
 
 app.get('/redirect/payment/:plan', (req, res)=>{
     res.sendFile(__dirname + '/static/auth.html')
