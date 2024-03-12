@@ -59,6 +59,7 @@ const runValidation = () => {
           return response.json();
         })
         .then((data) => {
+          console.log(data)
           if (data.status) {
             const thisPlan = plans.filter(function (el) {
               return el.planCode == data.data.plan;
