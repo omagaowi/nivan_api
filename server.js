@@ -4,7 +4,7 @@ const crypto = require("crypto");
 var cors = require("cors");
 const cookieParser = require('cookie-parser')
 
-const { createUser, newSubcription, findUserWithId, getSubscriptionWithRef } = require('./db');
+const { createUser, newSubcription, findUserWithId, getSubscriptionWithRef, allUsers } = require('./db');
 const { version } = require('process');
 
 //bots
@@ -129,6 +129,16 @@ app.post('/submit/payment/:plan', (req, res)=>{
 //     }
 //   }
 // });
+
+app.get('/test', (req, res)=>{
+    allUsers(({status, data})=>{
+        if(status){
+            res.json(data)
+        }else{
+            res.send('error')
+        }
+    })
+})
 
 app.get('/payment/verify', (req, res)=>{
     res.sendFile(__dirname + '/static/verify.html')
