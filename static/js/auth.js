@@ -120,6 +120,11 @@ const plans = [
     plan: "Exclusive Mentorship",
     price: "$200/mo",
   },
+  {
+    code: "signals",
+    plan: "Premium Signals",
+    price: "$30/mo",
+  },
 ];
 
 

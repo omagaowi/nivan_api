@@ -47,9 +47,7 @@
     animation-duration: 3s;
 }
 
-.container.verify .loader{
-    display: flex;
-}
+
 
 .main-box{
     max-width: 400px;
@@ -62,7 +60,7 @@
 .main-box .invalid{
     width: 100%;
     height: 100%;
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -202,4 +200,28 @@
         transform: scaleX(1);
         left: 110%;
     }
+}
+
+.container.verify .loader{
+    display: flex;
+}
+
+.container.verify .main-box{
+    display: none;
+}
+
+
+
+.container.valid .success{
+    display: flex;
+}
+
+.container.valid .main-box,
+.container.error .main-box{
+    display: flex;
+}
+
+
+.container.error .invalid{
+    display: flex;
 }
