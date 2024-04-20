@@ -4,11 +4,10 @@ const crypto = require("crypto");
 var cors = require("cors");
 const cookieParser = require('cookie-parser')
 
-const { createUser, newSubcription, findUserWithId, getSubscriptionWithRef, allUsers } = require('./db');
 const { version } = require('process');
+const { connectToDb, getDb } = require("./db2");
 
 //bots
-
 
 const { activateIntermdiateBot } = require('./bots/intermediate')
 // const { activateExclusiveBot } = require("./bots/exclusive");
@@ -26,7 +25,7 @@ const plans = [
       `Incase of any errors with the above, find out how to change your telegarm username and manage your data and subscription with nivanFX here.`,
       `It is important to join the telegram platform to get full access to this service. link below!!`,
     ],
-    telegram: `https://t.me/+gITCdV7SMzAzNDg0`,
+    telegram: `https://t.me/+UjLezAMIxPZiMDRk`,
   },
   {
     planCode: "PLN_cu7k3ly30mwip4g",
@@ -37,7 +36,7 @@ const plans = [
       `Incase of any errors with the above, find out how to change your telegarm username and manage your data and subscription with nivanFX here.`,
       `It is important to join the telegram platform to get full access to this service. link below!!`,
     ],
-    telegram: `https://t.me/+gITCdV7SMzAzNDg0`,
+    telegram: `https://t.me/+2rsnSiPVauBjYjk8`,
   },
   {
     planCode: "PLN_cu7k3ly30mwip4g",
@@ -48,7 +47,7 @@ const plans = [
       `Incase of any errors with the above, find out how to change your telegarm username and manage your data and subscription with nivanFX here.`,
       `It is important to join the telegram platform to get full access to this service. link below!!`,
     ],
-    telegram: `https://t.me/+gITCdV7SMzAzNDg0`,
+    telegram: `https://t.me/+nDTp_I6cjTRiNDNk`,
   },
   {
     planCode: "PLN_cu7k3ly30mwip4g",
@@ -59,17 +58,31 @@ const plans = [
       `Incase of any errors with the above, find out how to change your telegarm username and manage your data and subscription with nivanFX here.`,
       `It is important to join the telegram platform to get full access to this service. link below!!`,
     ],
-    telegram: `https://t.me/+gITCdV7SMzAzNDg0`,
+    telegram: `https://t.me/+jqQphEmZeiZlOWFk`,
   },
 ];
 
 const app = express()
 
+let db;
+connectToDb((err) => {
+  if (!err) {
+    db = getDb();
+    console.log("connected to database");
+     activateIntermdiateBot();
+    app.listen(3000);
+  } else {
+    console.log(err);
+  }
+});
+
+
 app.use(express.static('static'))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors())
+app.use(cors());
+
 
 app.get('/redirect/payment/:plan', (req, res)=>{
     res.sendFile(__dirname + '/static/auth.html')
@@ -151,88 +164,91 @@ app.get('/verify/:ref', (req, res)=>{
             if(result.status){
                 const thisPlan = plans.filter(function(el){ return el.planCode == result.data.plan})[0]
                 const fillingData = (memberID) =>{
-                     findUserWithId(memberID, ({ status, data }) => {
-                       if (status) {
-                         if (data.length > 0) {
-                           console.log("user already exists");
-                           const userID = Number(Date.now().toString().split("").splice(5, 5).join(''));
-                           fillingData(userID)
-                         } else {
-                           createUser(
-                             [
-                               memberID,
-                               req.cookies.name,
-                               req.cookies.email,
-                               req.cookies.phone,
-                               req.cookies.country,
-                               req.cookies.telegram,
-                             ],
-                             (createData) => {
-                               if (createData.status) {
-                                getSubscriptionWithRef("7ttoydmt1q", (veRef)=>{
-                                    if(veRef.status){
-                                        if(veRef.data.length > 0){
-                                            console.log('transaction already validated')
-                                             res.json({
-                                               status: true,
-                                               data: result.data,
-                                             });
-                                        }else{
-                                             newSubcription(
-                                               [
-                                                 Date.now(),
-                                                 createData.data, //memberId
-                                                 thisPlan.planCode,
-                                                 thisPlan.plan,
-                                                 paymentRef,
-                                                 req.cookies.telegram,
-                                                 true,
-                                               ],
-                                               (subData) => {
-                                                 if (subData.status) {
-                                                   console.log(
-                                                     "verification complete"
-                                                   );
-                                                   res.json({
-                                                     status: true,
-                                                     data: result.data,
-                                                   });
-                                                 } else {
-                                                   res.json({
-                                                     status: false,
-                                                     data: subData.data,
-                                                   });
-                                                 }
-                                               }
-                                             );
-                                        }
-                                    }else{
-                                        res.json({
-                                          status: false,
-                                          data: veRef.data,
+                      db.collection("users")
+                        .findOne({
+                          memberId: memberID,
+                        })
+                        .then((user) => {
+                          if (user) {
+                            console.log("user already exists");
+                            const userID = Number(
+                              Date.now()
+                                .toString()
+                                .split("")
+                                .splice(5, 5)
+                                .join("")
+                            );
+                            fillingData(userID);
+                          } else {
+                            db.collection("users")
+                              .insertOne({
+                                memberId: memberID,
+                                full_name: req.cookies.name,
+                                email: req.cookies.email,
+                                phone: req.cookies.phone,
+                                country: req.cookies.country,
+                                telegram: req.cookies.telegram,
+                              })
+                              .then(() => {
+                                console.log("user seccessfully added");
+                                db.collection("subcriptions")
+                                  .findOne({
+                                    payment_ref: paymentRef,
+                                  })
+                                  .then((trans) => {
+                                    if (trans) {
+                                      console.log(
+                                        "subcription already verified"
+                                      );
+                                      res.json({
+                                        status: true,
+                                        data: result.data,
+                                      });
+                                    } else {
+                                      db.collection("subcriptions")
+                                        .insertOne({
+                                          sub_id: Date.now(),
+                                          memberId: memberID,
+                                          planCode: thisPlan.planCode,
+                                          plan: thisPlan.plan,
+                                          payment_ref: paymentRef,
+                                          telegram: req.cookies.telegram,
+                                          valid: true,
+                                        })
+                                        .then(() => {
+                                          console.log(
+                                            "subscription successully added and verified"
+                                          );
+                                          res.json({
+                                            status: true,
+                                            data: result.data,
+                                          });
+                                        })
+                                        .catch((err) => {
+                                          res.json({
+                                            status: false,
+                                            data: "Án Error Occured",
+                                          });
                                         });
                                     }
-                                });
-                               } else {
-                                 res.json({
-                                   status: false,
-                                   data: createData.data,
-                                 });
-                               }
-                             }
-                           );
-                         }
-                       } else {
-                         res.json({
-                           status: false,
-                           data: data,
-                         });
-                       }
-                     });
+                                  })
+                                  .catch((err) => {
+                                    res.json({
+                                      status: false,
+                                      data: "Án Error Occured",
+                                    });
+                                  });
+                              });
+                          }
+                        }).catch((err) => {
+                          res.json({
+                            status: false,
+                            data: "Án Error Occured",
+                          });
+                        });
                 }
-
                  const userID = Number(Date.now().toString().split("").splice(5, 5).join(''));
-                 fillingData(userID)
+                 fillingData(userID);
             }else{
                  res.json({
                    status: false,
@@ -249,17 +265,39 @@ app.get('/verify/:ref', (req, res)=>{
 })
 
 
-
-
-app.listen(3000, (err)=>{
-    if(!err){
-        console.log('server is running at 3000')
-        activateIntermdiateBot()
-        // // activateIntermdiateBot()
-        // // activateExclusiveBot()
-        // // activateSignalsBot()
+app.post('/joinnewsletter', (req, res)=>{
+  const email = req.body.email
+  db.collection("NLwaitlist").findOne({
+    email: email
+  }).then((data)=>{
+    if(data){
+        res.json({
+          status: true,
+          data: "You have previously joined the Waitlist.",
+        });
     }else{
-        console.log('ERROR STARTING SERVER')
-        console.log(err)
+      db.collection("NLwaitlist")
+        .insertOne({
+          email: email,
+        })
+        .then(() => {
+          res.json({
+            status: true,
+            data: "You have Successfully joined the Waitlist.",
+          });
+        })
+        .catch((err) => {
+          res.json({
+            status: false,
+            data: "Án Error Occured",
+          });
+        });
     }
+  }).catch((err)=>{
+     res.json({
+       status: false,
+       data: "Án Error Occured",
+     });
+  })
 })
+
