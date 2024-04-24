@@ -48,11 +48,11 @@ const plans = [
 ];
 
 const runValidation = () => {
-      // const ref = window.location.href.split("&")[1].split("=")[1];
+      const ref = window.location.href.split("&")[1].split("=")[1];
         container.classList.remove("error");
       container.classList.add("verify");
        container.classList.remove("valid");
-      const ref = "7ttoydmt1q";
+      // const ref = "7ttoydmt1q";
       console.log(ref);
       fetch(`/verify/${ref}`)
         .then((response) => {

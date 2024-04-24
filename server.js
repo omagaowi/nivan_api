@@ -69,7 +69,7 @@ connectToDb((err) => {
   if (!err) {
     db = getDb();
     console.log("connected to database");
-    //  activateIntermdiateBot();
+     activateIntermdiateBot();
     app.listen(3000);
   } else {
     console.log(err);
