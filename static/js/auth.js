@@ -108,22 +108,22 @@ const plans = [
   {
     code: "intermediate",
     plan: "Intermediate Mentorship",
-    price: "$50/mo",
+    price: "$25/mo",
   },
   {
     code: "profitable",
     plan: "Profitable Trader",
-    price: "$100/mo",
+    price: "$50/mo",
   },
   {
     code: "exclusive",
     plan: "Exclusive Mentorship",
-    price: "$200/mo",
+    price: "$100/mo",
   },
   {
     code: "signals",
     plan: "Premium Signals",
-    price: "$30/mo",
+    price: "$15/mo",
   },
 ];
 
