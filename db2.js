@@ -1,11 +1,13 @@
 const { MongoClient } = require("mongodb");
 
+require("dotenv").config();
+
+const dbURI = process.env.DATABASE_URL;
+
 let dbConnection;
-const URI = "mongodb+srv://omagadvd:cre8tive@cluster0.od13iq7.mongodb.net/NIVAN-FX?retryWrites=true&w=majority&appName=Cluster0";
-// const URI =  'mongodb://localhost:27017/NIVAN-FX'
 module.exports = {
   connectToDb: (cb) => {
-    MongoClient.connect(URI)
+    MongoClient.connect(dbURI)
       .then((client) => {
         dbConnection = client.db();
         return cb();
