@@ -28,14 +28,16 @@ const plans = [
 ];
 
 
-const processTransaction = async (planCode, email, paystackAPI, callback) => {
+const processTransaction = async (planCode, userData, paystackAPI, callback) => {
+  console.log(userData)
   const thisPlan = plans.filter(function (el) {
     return el.id == planCode;
   })[0];
   const params = JSON.stringify({
-    email: email,
+    email: userData.email,
     amount: 100,
     plan: thisPlan.id,
+    metadata: userData
   });
 
   const options = {
@@ -100,6 +102,7 @@ const verifyTransaction = async (ref, paystackAPI, callback) => {
 
       res.on("end", () => {
         const result = JSON.parse(data)
+        console.log(result)
         callback({
           result: result,
           err: false

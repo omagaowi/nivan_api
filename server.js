@@ -114,7 +114,8 @@ app.get('/submit/payment/:plan', async (req, res)=>{
         const decode = await jwt.decode(reqToken, jwt_secret);
         if (decode) {
           if (decode.exp > currentTime) {
-               processTransaction(planCode, decode.data? decode.data.email : decode.email, paystackAPI, ({ result, err }) => {
+               const transactionID = Date.now()
+               processTransaction(planCode, decode.data? { ...decode.data, transactionID: transactionID } : decode, paystackAPI, ({ result, err }) => {
                  if (result) {
                    if (result.status) {
                      const responseData = result.data;
@@ -176,14 +177,16 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
   //validate event
    const event = req.body;
    console.log(event);
-  const hash = crypto
-    .createHmac("sha512", paystackAPI)
-    .update(JSON.stringify(req.body))
-    .digest("hex");
-  if (hash == req.headers["x-paystack-signature"]) {
-    // Retrieve the request's body
-    const event = req.body;
-    console.log(event)
+  if(event.event == 'subscription.create'){
+    const email = event.data.customer.email
+    const subcription_code = event.data.subscription_code
+    
+  }else if(event.event == 'charge.success'){
+
+  }else if(event.event == 'subscription.disable' || event.event == 'subscription.not_renew'){
+
+  }else if(event.event == 'invoice.payment_failed'){
+
   }
 });
 
