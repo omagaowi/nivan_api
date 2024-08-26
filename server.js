@@ -172,24 +172,20 @@ app.get('/submit/payment/:plan', async (req, res)=>{
 
 
 // // Using Express
-// app.post("/nivan_fx/webhook/url", function (req, res) {
-//   //validate event
-//   const hash = crypto
-//     .createHmac("sha512", "sk_live_3fe7ff54122f79596e91bdaea73372a09fab1e27")
-//     .update(JSON.stringify(req.body))
-//     .digest("hex");
-//   if (hash == req.headers["x-paystack-signature"]) {
-//     // Retrieve the request's body
-//     const event = req.body;
-//     if(event.data.status == 'success'){
-//         const plan = event.data.plan.plan_code
-//         const ref = event.data.reference
-//         // res.cookie('planId', plan)
-//         // res.cookie('ref', ref)
-//         // res.redirect('/payment/verify')
-//     }
-//   }
-// });
+app.post("/nivan_fx/webhook/url", function (req, res) {
+  //validate event
+   const event = req.body;
+   console.log(event);
+  const hash = crypto
+    .createHmac("sha512", paystackAPI)
+    .update(JSON.stringify(req.body))
+    .digest("hex");
+  if (hash == req.headers["x-paystack-signature"]) {
+    // Retrieve the request's body
+    const event = req.body;
+    console.log(event)
+  }
+});
 
 app.get('/test', (req, res)=>{
     allUsers(({status, data})=>{
