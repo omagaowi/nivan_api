@@ -44,7 +44,7 @@ const processTransaction = async (planCode, email, paystackAPI, callback) => {
     path: "/transaction/initialize",
     method: "POST",
     headers: {
-      Authorization: paystackAPI,
+      Authorization: `Bearer ${paystackAPI}`,
       "Content-Type": "application/json",
     },
   };
@@ -66,6 +66,7 @@ const processTransaction = async (planCode, email, paystackAPI, callback) => {
       });
     })
     .on("error", (error) => {
+      console.log(error)
       callback({
         result: false,
         error: error,
@@ -83,7 +84,7 @@ const verifyTransaction = async (ref, paystackAPI, callback) => {
     path: `/transaction/verify/${ref}`,
     method: "GET",
     headers: {
-      Authorization: paystackAPI,
+      Authorization: `Bearer ${paystackAPI}`,
     },
   };
 
