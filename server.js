@@ -123,12 +123,14 @@ app.get('/submit/payment/:plan', async (req, res)=>{
                        data: responseData,
                      });
                    } else {
+                    console.log(result, err)
                      res.json({
                        status: false,
                        msg: "an error occured",
                      });
                    }
                  } else {
+                    console.log(result, err);
                    res.json({
                      status: false,
                      msg: "an error occured",

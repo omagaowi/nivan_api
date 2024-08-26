@@ -78,6 +78,8 @@ const processTransaction = async (planCode, email, paystackAPI, callback) => {
 };
 
 const verifyTransaction = async (ref, paystackAPI, callback) => {
+  console.log('d', 
+    paystackAPI)
   const options = {
     hostname: "api.paystack.co",
     port: 443,
