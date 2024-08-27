@@ -19,6 +19,7 @@ const paystackAPI = process.env.PAYSTACK_SECRET;
 const { activateIntermdiateBot } = require('./bots/intermediate');
 const { error } = require('console');
 const { json } = require('body-parser');
+const { type } = require('os');
 // const { activateExclusiveBot } = require("./bots/exclusive");
 // const { activeProfitableBot } = require("./bots/profitable");
 // const { activateSignalsBot } = require("./bots/signals");
@@ -180,13 +181,201 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
   if(event.event == 'subscription.create'){
     const email = event.data.customer.email
     const subcription_code = event.data.subscription_code
-    
+    const authorization_code = event.data.authorization.authorization_code
+    const next_date = event.data.next_payment_date
+    // const createdAt = event.data.createdAt
+    const planCode = event.data.plan.plan_code
+    const plan = plans.filter(function(el){
+      return el.planCode == planCode
+    })[0].plan
+    const card_details = {
+      brand: event.data.authorization.brand,
+      last4: event.data.authorization.last4,
+    };
+    db.collection("subscriptions").findOne({ authorization_code: authorization_code }).then((data)=>{
+        if(data){
+          db.collection("subscriptions")
+            .updateOne(
+              { authorization_code: authorization_code },
+              {
+                $set: {
+                  subcription_code: subcription_code,
+                  next_date: next_date,
+                  email: email,
+                  authorization_code: authorization_code,
+                  card_name: `${card_details.brand} ${card_details.last4}`,
+                  planCode: planCode,
+                  plan: plan,
+                  status: "renew",
+                },
+              }
+            )
+            .then((data) => {
+              console.log("sub edited");
+            })
+            .catch((err) => {
+              console.log("sub edited error");
+            });
+        }else{
+          const subscription = {
+            email: email,
+            memberId: false,
+            planCode: planCode,
+            plan: plan,
+            payment_ref: false,
+            telegram: false,
+            valid: true,
+            type: plans.filter(function (el) {
+              return el.planCode == planCode;
+            })[0].type,
+            authorization_code: authorization_code,
+            createdAt: false,
+            next_date: next_date,
+            card_name: `${card_details.brand} ${card_details.last4}`,
+            subcription_code: subcription_code,
+            last_paid: false,
+            discord: false,
+            status: "renew",
+          };
+          db.collection('subscriptions').insertOne(subscription).then((data)=>{
+            console.log('sub added')
+          }).catch((err)=>{
+             console.log("sub added error");
+          })
+        }
+    }).catch((err) => {
+      console.log("sub find error");
+    });
   }else if(event.event == 'charge.success'){
+     const reference = event.data.reference
+     const authorization_code = event.data.authorization.authorization_code;
+     const email = event.data.customer.email;
+     const createdAt = event.data.created_at;
+     const last_paid = event.data.paidAt
+     const planCode = event.data.plan.plan_code;
+     const plan = plans.filter(function (el) {
+       return el.planCode == planCode;
+     })[0].plan;
+     const card_details = {
+       brand: event.data.authorization.brand,
+       last4: event.data.authorization.last4,
+     };
+     const telegram = event.data.metadata.telegram;
+     const discord = event.data.metadata.discord;
+     const memberId = event.data.metadata.memberID;
+     db.collection("subscriptions").findOne({ authorization_code: authorization_code }).then((data)=>{
+        if(data){
+          db.collection("subscriptions")
+            .updateOne(
+              { authorization_code: authorization_code },
+              {
+                $set: {
+                  email: email,
+                  authorization_code: authorization_code,
+                  card_name: `${card_details.brand} ${card_details.last4}`,
+                  last_paid: last_paid,
+                  payment_ref: reference,
+                  createdAt: createdAt,
+                  planCode: planCode,
+                  plan: plan,
+                  telegram: telegram,
+                  memberId: memberId,
+                  discord: discord,
+                  status: "renew",
+                },
+              }
+            )
+            .then((data) => {
+              console.log("sub edited charge");
+            })
+            .catch((err) => {
+              console.log("sub edited charge error");
+            });
+        }else{
+          const subscription = {
+            email: email,
+            memberId: memberId,
+            planCode: planCode,
+            plan: plan,
+            payment_ref: reference,
+            telegram: telegram,
+            valid: true,
+            type: plans.filter(function (el) {
+              return el.planCode == planCode;
+            })[0].type,
+            authorization_code: authorization_code,
+            createdAt: false,
+            next_date: next_date,
+            card_name: `${card_details.brand} ${card_details.last4}`,
+            subcription_code: false,
+            last_paid: last_paid,
+            discord: discord,
+            status: 'renew'
+          };
+          db.collection('subscriptions').insertOne(subscription).then((data)=>{
+            console.log('sub added charge')
+          }).catch((err)=>{
+             console.log("sub added charge error ");
+          })
+        }
+    }).catch((err) => {
+       console.log("sub find charge error ");
+    });
 
-  }else if(event.event == 'subscription.disable' || event.event == 'subscription.not_renew'){
-
+  }else if(event.event == 'subscription.disable'){
+    const subcription_code = event.data.subscription_code;
+    db.collection("subscriptions").findOne({ subcription_code: subcription_code }).then((data)=>{
+      if(data){
+        db.collection("subscriptions").updateOne({ subcription_code: subcription_code }, { $set: {
+           valid: false,
+           status: 'not_renew'
+        }}).then((data)=>{
+          console.log('sub failed update')
+        }).catch((err)=>{
+          console.log("sub failed update error");
+        })
+      }else{
+        console.log('sub not found')
+      }
+    }).catch(err => {
+      console.log('sub disable error')
+    });
+  }else if(event.event == 'subscription.not_renew'){
+    const subcription_code = event.data.subscription_code;
+    db.collection("subscriptions").findOne({ subcription_code: subcription_code }).then((data)=>{
+      if(data){
+        db.collection("subscriptions").updateOne({ subcription_code: subcription_code }, { $set: {
+           valid: true,
+           status: 'not_renew'
+        }}).then((data)=>{
+          console.log('sub failed update')
+        }).catch((err)=>{
+          console.log("sub failed update error");
+        })
+      }else{
+        console.log('sub not found')
+      }
+    }).catch(err => {
+      console.log('sub disable error')
+    });
   }else if(event.event == 'invoice.payment_failed'){
-
+     const subcription_code = event.data.subscription.subscription_code;
+     db.collection("subscriptions").findOne({ subcription_code: subcription_code }).then((data)=>{
+      if(data){
+        db.collection("subscriptions").updateOne({ subcription_code: subcription_code }, { $set: {
+           valid: false,
+           status: 'not_renew'
+        }}).then((data)=>{
+          console.log('sub ivoice failed update')
+        }).catch((err)=>{
+          console.log("sub ivoice failed update error");
+        })
+      }else{
+        console.log("sub ivoice not found");
+      }
+    }).catch(err => {
+      console.log("sub ivoice disable error");
+    });
   }
 });
 
@@ -287,6 +476,7 @@ app.post('/auth/login', (req, res)=>{
 app.post('/auth/user', (req, res)=>{
   const email = req.body.email
   db.collection('users').findOne({ email: email }).then((data) => {
+    console.log(data)
     if(data){
       res.json({
         status: true,
@@ -553,6 +743,23 @@ app.get('/verify/:ref', async (req, res)=>{
                         return el.planCode == result.data.plan;
                       })[0];
                       const fillingData = (memberID) => {
+                         const reference = result.data.reference;
+                         const authorization_code =
+                           result.data.authorization.authorization_code;
+                         const email = result.data.customer.email;
+                         const createdAt = result.data.created_at;
+                         const last_paid = result.data.paid_at;
+                         const planCode = result.data.plan;
+                         console.log(planCode)
+                         const plan = plans.filter(function (el) {
+                           return el.planCode == planCode;
+                         })[0].plan;
+                         const card_details = {
+                           brand: result.data.authorization.brand,
+                           last4: result.data.authorization.last4,
+                         };
+                         const telegram = result.data.metadata.telegram;
+                         const discord = result.data.metadata.discord;
                         db.collection("users")
                           .findOne({
                             memberId: memberID,
@@ -561,36 +768,77 @@ app.get('/verify/:ref', async (req, res)=>{
                             if (user) {
                                db.collection("subcriptions")
                                  .findOne({
-                                   payment_ref: paymentRef,
+                                   authorization_code: authorization_code,
                                  })
                                  .then((trans) => {
                                    if (trans) {
-                                     res.json({
-                                       status: true,
-                                       data: {
-                                         transaction: result.data,
-                                         plan: thisPlan,
-                                       },
-                                     });
-                                   } else {
-                                     db.collection("subcriptions")
-                                       .insertOne({
-                                         sub_id: Date.now(),
-                                         memberId: memberID,
-                                         planCode: thisPlan.planCode,
-                                         plan: thisPlan.plan,
-                                         payment_ref: paymentRef,
-                                         telegram: decode.data? decode.data.telegram : decode.telegram,
-                                         valid: true,
-                                         type: thisPlan.type,
+                                     db.collection("subscriptions")
+                                       .updateOne(
+                                         {
+                                           authorization_code:
+                                             authorization_code,
+                                         },
+                                         {
+                                           $set: {
+                                             email: email,
+                                             authorization_code:
+                                               authorization_code,
+                                             payment_ref: reference,
+                                             createdAt: createdAt,
+                                             last_paid: last_paid,
+                                             discord: discord,
+                                             telegram: telegram,
+                                             memberId: memberID,
+                                             card_name: `${card_details.brand} ${card_details.last4}`,
+                                             planCode: planCode,
+                                             plan: plan,
+                                             status: "renew",
+                                           },
+                                         }
+                                       )
+                                       .then((data) => {
+                                         res.json({
+                                           status: true,
+                                           data: {
+                                             transaction: result.data,
+                                             plan: thisPlan,
+                                           },
+                                         });
+                                         console.log("sub edited");
                                        })
+                                       .catch((err) => {
+                                         console.log("sub edited error");
+                                       });
+                                   } else {
+                                     const subscription = {
+                                       email: email,
+                                       memberId: memberID,
+                                       planCode: planCode,
+                                       plan: plan,
+                                       payment_ref: reference,
+                                       telegram: telegram,
+                                       valid: true,
+                                       type: plans.filter(function (el) {
+                                         return el.planCode == planCode;
+                                       })[0].type,
+                                       authorization_code: authorization_code,
+                                       createdAt: createdAt,
+                                       next_date: false,
+                                       card_name: `${card_details.brand} ${card_details.last4}`,
+                                       subcription_code: false,
+                                       last_paid: last_paid,
+                                       discord: discord,
+                                       status: "renew",
+                                     };
+                                     db.collection("subcriptions")
+                                       .insertOne(subscription)
                                        .then(() => {
                                          res.json({
                                            status: true,
                                            data: {
-                                            transaction: result.data,
-                                            plan: thisPlan
-                                           }
+                                             transaction: result.data,
+                                             plan: thisPlan,
+                                           },
                                          });
                                        })
                                        .catch((err) => {
@@ -608,6 +856,7 @@ app.get('/verify/:ref', async (req, res)=>{
                                    });
                                  });
                             } else {
+                              console.log('444')
                               res.status(500).json({
                                 status: false,
                                 msg: "Invalid Token",
@@ -636,30 +885,36 @@ app.get('/verify/:ref', async (req, res)=>{
                   }
                 });
             } else {
+              console.log("4445");
               res.status(500).json({
+                
                 status: false,
                 msg: "Invalid Token",
               });
             }
           } else {
+            console.log('4446')
             res.status(500).json({
               status: false,
               msg: "Invalid Token",
             });
           }
         } else {
+          console.log("4447");
           res.status(500).json({
             status: false,
             msg: "Invalid Token",
           });
         }
       } catch (err) {
+        console.log("4448");
         res.status(500).json({
           status: false,
           msg: "Invalid Token",
         });
       }
     } else {
+      console.log("4449");
       res.status(500).json({
         status: false,
         msg: "invalid api key",
