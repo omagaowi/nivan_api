@@ -791,7 +791,7 @@ app.get('/verify/:ref', async (req, res)=>{
                                  })
                                  .then((trans) => {
                                    if (trans) {
-                                    console.log(trans)
+                                    console.log('d', trans)
                                      db.collection("subscriptions")
                                        .updateOne(
                                          {
