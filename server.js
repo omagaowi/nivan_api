@@ -262,7 +262,7 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
      };
      const telegram = event.data.metadata.telegram;
      const discord = event.data.metadata.discord;
-     const memberId = event.data.metadata.memberID;
+     const memberId = event.data.metadata.memberId;
      db.collection("subscriptions").findOne({ authorization_code: authorization_code }).then((data)=>{
         if(data){
           db.collection("subscriptions")
@@ -324,11 +324,16 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
 
   }else if(event.event == 'subscription.disable'){
     const subcription_code = event.data.subscription_code;
+    const card_details = {
+        brand: event.data.authorization.brand,
+        last4: event.data.authorization.last4,
+    };
     db.collection("subscriptions").findOne({ subcription_code: subcription_code }).then((data)=>{
       if(data){
         db.collection("subscriptions").updateOne({ subcription_code: subcription_code }, { $set: {
            valid: false,
-           status: 'not_renew'
+           status: 'not_renew',
+           card_name: `${card_details.brand} ${card_details.last4}`
         }}).then((data)=>{
           console.log('sub failed update')
         }).catch((err)=>{
@@ -360,11 +365,16 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
     });
   }else if(event.event == 'invoice.payment_failed'){
      const subcription_code = event.data.subscription.subscription_code;
+      const card_details = {
+        brand: event.data.authorization.brand,
+        last4: event.data.authorization.last4,
+      };
      db.collection("subscriptions").findOne({ subcription_code: subcription_code }).then((data)=>{
       if(data){
         db.collection("subscriptions").updateOne({ subcription_code: subcription_code }, { $set: {
            valid: false,
-           status: 'not_renew'
+           status: 'not_renew',
+           card_name: `${card_details.brand} ${card_details.last4}`
         }}).then((data)=>{
           console.log('sub ivoice failed update')
         }).catch((err)=>{
