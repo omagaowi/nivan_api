@@ -791,7 +791,6 @@ app.get('/verify/:ref', async (req, res)=>{
                                  })
                                  .then((trans) => {
                                    if (trans) {
-                                    console.log('d', trans)
                                      db.collection("subscriptions")
                                        .updateOne(
                                          {
@@ -812,7 +811,6 @@ app.get('/verify/:ref', async (req, res)=>{
                                              card_name: `${card_details.brand} ${card_details.last4}`,
                                              planCode: planCode,
                                              plan: plan,
-                                             status: trans.status? trans.status : 'renew',
                                            },
                                          }
                                        )
