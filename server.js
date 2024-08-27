@@ -253,6 +253,7 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
      const createdAt = event.data.created_at;
      const last_paid = event.data.paidAt
      const planCode = event.data.plan.plan_code;
+     const amount = event.data.amount
      const plan = plans.filter(function (el) {
        return el.planCode == planCode;
      })[0].plan;
@@ -347,6 +348,12 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
     });
   }else if(event.event == 'subscription.not_renew'){
     const subcription_code = event.data.subscription_code;
+    const amount = event.data.amount
+    const date = Date.now()
+    const card_details = {
+      brand: event.data.authorization.brand,
+      last4: event.data.authorization.last4,
+    };
     db.collection("subscriptions").findOne({ subcription_code: subcription_code }).then((data)=>{
       if(data){
         db.collection("subscriptions").updateOne({ subcription_code: subcription_code }, { $set: {
@@ -369,6 +376,8 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
         brand: event.data.authorization.brand,
         last4: event.data.authorization.last4,
       };
+      const amount = event.data.amount;
+      const date = Date.now();
      db.collection("subscriptions").findOne({ subcription_code: subcription_code }).then((data)=>{
       if(data){
         db.collection("subscriptions").updateOne({ subcription_code: subcription_code }, { $set: {
@@ -802,7 +811,7 @@ app.get('/verify/:ref', async (req, res)=>{
                                              card_name: `${card_details.brand} ${card_details.last4}`,
                                              planCode: planCode,
                                              plan: plan,
-                                             status: "renew",
+                                             status: trans.status? trans.status : 'renew',
                                            },
                                          }
                                        )
