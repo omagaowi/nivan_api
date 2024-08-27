@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken')
 require("dotenv").config();
 
 const { connectToDb, getDb } = require("./db2");
+const { paymentSuccessTemmp } = require('./emailTemps/paymentSucess')
 const fs = require('fs')
 
 const api_key = process.env.NIVAN_API_KEY;
@@ -261,6 +262,23 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
        brand: event.data.authorization.brand,
        last4: event.data.authorization.last4,
      };
+     const emailData = {
+      reference: reference,
+      authorization_code: authorization_code,
+      email: email,
+      createdAt: createdAt,
+      last_paid: last_paid,
+      plan: plan,
+      planCode: planCode,
+      card_details: card_details,
+      amount: amount
+     }
+    //  paymentSuccessTemmp(emailData)
+    //  sendMail(paymentSuccessTemmp(emailData), emailData).then(()=>{
+    //     console.log('email sent ')
+    //  }).catch((err)=>{
+    //     console.log("email error ");
+    //  })
      const telegram = event.data.metadata.telegram;
      const discord = event.data.metadata.discord;
      const memberId = event.data.metadata.memberId;
