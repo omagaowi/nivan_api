@@ -21,17 +21,17 @@ const plans = [
   },
 ];
 
-const activateIntermdiateBot = () => {
+const activateIntermdiateBot = (db) => {
 
-  let db;
-  connectToDb((err) => {
-    if (!err) {
-      db = getDb();
-      console.log("connected to database 2");
-    } else {
-      console.log(err);
-    }
-  });
+  // let db;
+  // connectToDb((err) => {
+  //   if (!err) {
+  //     db = getDb();
+  //     console.log("connected to database 2");
+  //   } else {
+  //     console.log(err);
+  //   }
+  // });
 
  
   const bot = new TelegramBot(
@@ -42,10 +42,9 @@ const activateIntermdiateBot = () => {
     try {
       const chatId = msg.chat.id;
       const newMembers = msg.new_chat_members;
-      
     //   console.log(msg);
       let allUsers = []
-        db.collection('users').find().forEach(element => {
+        db.collection('subscriptions').find().forEach(element => {
           allUsers.push(element)
         }).then(async ()=>{
             const status = true
@@ -53,12 +52,12 @@ const activateIntermdiateBot = () => {
               for (const member of newMembers) {
                 const userName = member.username;
                 const thisUser = allUsers.filter(function(el){
-                      return el.telegram == userName
+                    return el.telegram == userName
                 })
                 const getGroup = plans.filter(function(el){
                   return el.group == msg.chat.title;
                 })[0]
-                if(getGroup.group == thisUser.plan){
+                if(getGroup.name == thisUser[0].plan){
                       if (thisUser.length > 0) {
                         if (thisUser[0].valid) {
                           await bot.sendMessage(
@@ -133,7 +132,7 @@ const activateIntermdiateBot = () => {
     console.log(error);
     console.log("ERRRR");
   });
-  console.log("Intermediate Bot is running...");
+  console.log("telegram bot is running");
 };
 
 module.exports = { activateIntermdiateBot };
