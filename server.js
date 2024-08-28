@@ -846,16 +846,7 @@ app.get('/verify/:ref', async (req, res)=>{
                             memberId: memberID,
                           })
                           .then((user) => { 
-                            if (user) {
-                              db.collection("subscriptions")
-                                .deleteMany({
-                                  email: email,
-                                  type: plans.filter(function (el) {
-                                    return el.planCode == planCode;
-                                  })[0].type,
-                                  status: 'not_renew'
-                                })
-                                .then(() => {
+                            if (user) {    
                                   console.log("delete success");
                                   db.collection("subscriptions")
                                     .findOne({
@@ -946,10 +937,7 @@ app.get('/verify/:ref', async (req, res)=>{
                                         data: "Án Error Occured",
                                       });
                                     });
-                                })
-                                .catch((err) => {
-                                  console.log("delete err");
-                                });
+                                
                             } else {
                               console.log('444')
                               res.status(500).json({
