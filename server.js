@@ -84,7 +84,7 @@ connectToDb((err) => {
     db = getDb();
     console.log("connected to database");
     
-     activateIntermdiateBot(db);
+    //  activateIntermdiateBot(db);
     // runDiscordBot(db)
     app.listen(4000);
   } else {
