@@ -85,8 +85,8 @@ connectToDb((err) => {
     db = getDb();
     console.log("connected to database");
     if (env == "PRODUCTION") {
-      activateIntermdiateBot(db);
-      runDiscordBot(db);
+      // activateIntermdiateBot(db);
+      // runDiscordBot(db);
     }
     app.listen(4000);
   } else {
