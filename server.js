@@ -177,6 +177,7 @@ app.get('/submit/payment/:plan', async (req, res)=>{
 
 
 
+
 // // Using Express
 app.post("/nivan_fx/webhook/url", function (req, res) {
   //validate event
@@ -195,77 +196,80 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
       brand: event.data.authorization.brand,
       last4: event.data.authorization.last4,
     };
-    db.collection("subscriptions").deleteMany({
-      email: email,
-      type: plans.filter(function(el){
-      return el.planCode == planCode
-    })[0].type,
-      authorization_code: { $ne: authorization_code },
-    }).then(()=>{
-      console.log('delete success')
-       db.collection("subscriptions")
-         .findOne({ authorization_code: authorization_code })
-         .then((data) => {
-           if (data) {
-             db.collection("subscriptions")
-               .updateOne(
-                 { authorization_code: authorization_code },
-                 {
-                   $set: {
-                     subcription_code: subcription_code,
-                     next_date: next_date,
-                     email: email,
-                     authorization_code: authorization_code,
-                     card_name: `${card_details.brand} ${card_details.last4}`,
-                     planCode: planCode,
-                     plan: plan,
-                     status: "renew",
-                   },
-                 }
-               )
-               .then((data) => {
-                 console.log("sub edited");
-               })
-               .catch((err) => {
-                 console.log("sub edited error");
-               });
-           } else {
-             const subscription = {
-               email: email,
-               memberId: false,
-               planCode: planCode,
-               plan: plan,
-               payment_ref: false,
-               telegram: false,
-               valid: true,
-               type: plans.filter(function (el) {
-                 return el.planCode == planCode;
-               })[0].type,
-               authorization_code: authorization_code,
-               createdAt: false,
-               next_date: next_date,
-               card_name: `${card_details.brand} ${card_details.last4}`,
-               subcription_code: subcription_code,
-               last_paid: false,
-               discord: false,
-               status: "renew",
-             };
-             db.collection("subscriptions")
-               .insertOne(subscription)
-               .then((data) => {
-                 console.log("sub added");
-               })
-               .catch((err) => {
-                 console.log("sub added error");
-               });
-           }
-         })
-         .catch((err) => {
-           console.log("sub find error");
-         });
-    }).catch((err)=>{
-      console.log('delete err')
-    })
+    db.collection("subscriptions")
+      .deleteMany({
+        email: email,
+        type: plans.filter(function (el) {
+          return el.planCode == planCode;
+        })[0].type,
+        status: "not_renew",
+      })
+      .then(() => {
+        console.log("delete success");
+        db.collection("subscriptions")
+          .findOne({ authorization_code: authorization_code })
+          .then((data) => {
+            if (data) {
+              db.collection("subscriptions")
+                .updateOne(
+                  { authorization_code: authorization_code },
+                  {
+                    $set: {
+                      subcription_code: subcription_code,
+                      next_date: next_date,
+                      email: email,
+                      authorization_code: authorization_code,
+                      card_name: `${card_details.brand} ${card_details.last4}`,
+                      planCode: planCode,
+                      plan: plan,
+                      status: "renew",
+                    },
+                  }
+                )
+                .then((data) => {
+                  console.log("sub edited");
+                })
+                .catch((err) => {
+                  console.log("sub edited error");
+                });
+            } else {
+              const subscription = {
+                email: email,
+                memberId: false,
+                planCode: planCode,
+                plan: plan,
+                payment_ref: false,
+                telegram: false,
+                valid: true,
+                type: plans.filter(function (el) {
+                  return el.planCode == planCode;
+                })[0].type,
+                authorization_code: authorization_code,
+                createdAt: false,
+                next_date: next_date,
+                card_name: `${card_details.brand} ${card_details.last4}`,
+                subcription_code: subcription_code,
+                last_paid: false,
+                discord: false,
+                status: "renew",
+              };
+              db.collection("subscriptions")
+                .insertOne(subscription)
+                .then((data) => {
+                  console.log("sub added");
+                })
+                .catch((err) => {
+                  console.log("sub added error");
+                });
+            }
+          })
+          .catch((err) => {
+            console.log("sub find error");
+          });
+      })
+      .catch((err) => {
+        console.log("delete err");
+      });
   }else if(event.event == 'charge.success'){
      const reference = event.data.reference
      const authorization_code = event.data.authorization.authorization_code;
@@ -301,81 +305,84 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
      const telegram = event.data.metadata.telegram;
      const discord = event.data.metadata.discord;
      const memberId = event.data.metadata.memberId;
-     db.collection("subscriptions").deleteMany({
-      email: email,
-      type: plans.filter(function(el){
-      return el.planCode == planCode
-    })[0].type,
-      authorization_code: { $ne: authorization_code },
-    }).then(()=>{
-      console.log('delete success')
-       db.collection("subscriptions")
-         .findOne({ authorization_code: authorization_code })
-         .then((data) => {
-           if (data) {
-             db.collection("subscriptions")
-               .updateOne(
-                 { authorization_code: authorization_code },
-                 {
-                   $set: {
-                     email: email,
-                     authorization_code: authorization_code,
-                     card_name: `${card_details.brand} ${card_details.last4}`,
-                     last_paid: last_paid,
-                     payment_ref: reference,
-                     createdAt: createdAt,
-                     planCode: planCode,
-                     plan: plan,
-                     telegram: telegram,
-                     memberId: memberId,
-                     discord: discord,
-                     status: "renew",
-                   },
-                 }
-               )
-               .then((data) => {
-                 console.log("sub edited charge");
-               })
-               .catch((err) => {
-                 console.log("sub edited charge error");
-               });
-           } else {
-             const subscription = {
-               email: email,
-               memberId: memberId,
-               planCode: planCode,
-               plan: plan,
-               payment_ref: reference,
-               telegram: telegram,
-               valid: true,
-               type: plans.filter(function (el) {
-                 return el.planCode == planCode;
-               })[0].type,
-               authorization_code: authorization_code,
-               createdAt: false,
-               next_date: next_date,
-               card_name: `${card_details.brand} ${card_details.last4}`,
-               subcription_code: false,
-               last_paid: last_paid,
-               discord: discord,
-               status: "renew",
-             };
-             db.collection("subscriptions")
-               .insertOne(subscription)
-               .then((data) => {
-                 console.log("sub added charge");
-               })
-               .catch((err) => {
-                 console.log("sub added charge error ");
-               });
-           }
-         })
-         .catch((err) => {
-           console.log("sub find charge error ");
-         });
-    }).catch((err)=>{
-      console.log('delete err')
-    })
+     db.collection("subscriptions")
+       .deleteMany({
+         email: email,
+         type: plans.filter(function (el) {
+           return el.planCode == planCode;
+         })[0].type,
+         status: "not_renew",
+       })
+       .then(() => {
+         console.log("delete success");
+         db.collection("subscriptions")
+           .findOne({ authorization_code: authorization_code })
+           .then((data) => {
+             if (data) {
+               db.collection("subscriptions")
+                 .updateOne(
+                   { authorization_code: authorization_code },
+                   {
+                     $set: {
+                       email: email,
+                       authorization_code: authorization_code,
+                       card_name: `${card_details.brand} ${card_details.last4}`,
+                       last_paid: last_paid,
+                       payment_ref: reference,
+                       createdAt: createdAt,
+                       planCode: planCode,
+                       plan: plan,
+                       telegram: telegram,
+                       memberId: memberId,
+                       discord: discord,
+                       status: "renew",
+                     },
+                   }
+                 )
+                 .then((data) => {
+                   console.log("sub edited charge");
+                 })
+                 .catch((err) => {
+                   console.log("sub edited charge error");
+                 });
+             } else {
+               const subscription = {
+                 email: email,
+                 memberId: memberId,
+                 planCode: planCode,
+                 plan: plan,
+                 payment_ref: reference,
+                 telegram: telegram,
+                 valid: true,
+                 type: plans.filter(function (el) {
+                   return el.planCode == planCode;
+                 })[0].type,
+                 authorization_code: authorization_code,
+                 createdAt: false,
+                 next_date: next_date,
+                 card_name: `${card_details.brand} ${card_details.last4}`,
+                 subcription_code: false,
+                 last_paid: last_paid,
+                 discord: discord,
+                 status: "renew",
+               };
+               db.collection("subscriptions")
+                 .insertOne(subscription)
+                 .then((data) => {
+                   console.log("sub added charge");
+                 })
+                 .catch((err) => {
+                   console.log("sub added charge error ");
+                 });
+             }
+           })
+           .catch((err) => {
+             console.log("sub find charge error ");
+           });
+       })
+       .catch((err) => {
+         console.log("delete err");
+       });
 
   }else if(event.event == 'subscription.disable'){
     const subcription_code = event.data.subscription_code;
@@ -846,9 +853,7 @@ app.get('/verify/:ref', async (req, res)=>{
                                   type: plans.filter(function (el) {
                                     return el.planCode == planCode;
                                   })[0].type,
-                                  authorization_code: {
-                                    $ne: authorization_code,
-                                  },
+                                  status: 'not_renew'
                                 })
                                 .then(() => {
                                   console.log("delete success");

@@ -43,7 +43,7 @@ const runDiscordBot = (db) => {
       // Fetch the role from the guild
       const userName = member.user.globalName
       try{
-              db.collection('   ').findOne({ discord: userName }).then(async (data) => {
+              db.collection('subscriptions').findOne({ discord: userName }).then(async (data) => {
                       console.log(data)
                       const roleId = discordPlans.filter(function (el) {
                         return el.planCode == data.planCode;
