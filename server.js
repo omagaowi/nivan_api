@@ -857,7 +857,7 @@ app.get('/verify/:ref', async (req, res)=>{
                                 })
                                 .then(() => {
                                   console.log("delete success");
-                                  db.collection("subcriptions")
+                                  db.collection("subscriptions")
                                     .findOne({
                                       authorization_code: authorization_code,
                                     })
@@ -921,7 +921,7 @@ app.get('/verify/:ref', async (req, res)=>{
                                           discord: discord,
                                           status: "renew",
                                         };
-                                        db.collection("subcriptions")
+                                        db.collection("subscriptions")
                                           .insertOne(subscription)
                                           .then(() => {
                                             res.json({
