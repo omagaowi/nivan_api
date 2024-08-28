@@ -15,6 +15,7 @@ const api_key = process.env.NIVAN_API_KEY;
 const jwt_secret = process.env.JWT_SECRET;
 const dbURI = process.env.DATABASE_URL;
 const paystackAPI = process.env.PAYSTACK_SECRET;
+const env = process.env.ENV_STATUS;
 
 
 const { activateIntermdiateBot } = require('./bots/intermediate');
@@ -83,9 +84,10 @@ connectToDb((err) => {
   if (!err) {
     db = getDb();
     console.log("connected to database");
-    
-     activateIntermdiateBot(db);
-    runDiscordBot(db)
+    if (env == "PRODUCTION") {
+      activateIntermdiateBot(db);
+      runDiscordBot(db);
+    }
     app.listen(4000);
   } else {
     console.log(err);
