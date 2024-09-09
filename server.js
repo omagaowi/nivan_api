@@ -1012,7 +1012,6 @@ app.post('/joinnewsletter', (req, res)=>{
   const dateAdded = `${formatDate(Date.now()).fullLong} ${formatDate(Date.now()).time}`
   db.collection("NLwaitlist").findOne({
     email: email,
-    time: dateAdded
   }).then((data)=>{
     if(data){
         res.json({
@@ -1023,6 +1022,7 @@ app.post('/joinnewsletter', (req, res)=>{
       db.collection("NLwaitlist")
         .insertOne({
           email: email,
+          time: dateAdded,
         })
         .then(() => {
           res.json({
