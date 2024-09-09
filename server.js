@@ -17,13 +17,14 @@ const dbURI = process.env.DATABASE_URL;
 const paystackAPI = process.env.PAYSTACK_SECRET;
 const env = process.env.ENV_STATUS;
 
+const { formatDate } = require('./dateFormat')
+
 
 const { activateIntermdiateBot } = require('./bots/intermediate');
 const { error } = require('console');
 const { json } = require('body-parser');
 const { type } = require('os');
 const runDiscordBot = require('./bots/discordBot');
-
 
 
 const plans = [
@@ -1008,8 +1009,10 @@ app.get('/verify/:ref', async (req, res)=>{
 
 app.post('/joinnewsletter', (req, res)=>{
   const email = req.body.email
+  const dateAdded = `${formatDate(Date.now()).fullLong} ${formatDate(Date.now()).time}`
   db.collection("NLwaitlist").findOne({
-    email: email
+    email: email,
+    time: dateAdded
   }).then((data)=>{
     if(data){
         res.json({
