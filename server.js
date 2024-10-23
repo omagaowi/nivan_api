@@ -460,6 +460,10 @@ app.post("/nivan_fx/webhook/url", function (req, res) {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('server working')
+})
+
 app.get('/test', (req, res)=>{
     allUsers(({status, data})=>{
         if(status){
